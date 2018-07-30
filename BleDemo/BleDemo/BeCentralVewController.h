@@ -9,8 +9,14 @@
 #import <UIKit/UIKit.h>
 #import <CoreBluetooth/CoreBluetooth.h>
 
-@interface BeCentralVewController : UIViewController<CBCentralManagerDelegate,CBPeripheralDelegate>
+@interface BeCentralVewController : UIViewController
 
-
-
+-(void)writeCharacteristic:(CBPeripheral *)peripheral
+            characteristic:(CBCharacteristic *)characteristic
+                     value:(NSData *)value;
+-(void)notifyCharacteristic:(CBPeripheral *)peripheral
+             characteristic:(CBCharacteristic *)characteristic;
+-(void)cancelNotifyCharacteristic:(CBPeripheral *)peripheral
+                   characteristic:(CBCharacteristic *)characteristic;
+-(void)writeCharacteristic:(CBPeripheral *)peripheral value:(NSData *)data forDescriptor:(CBDescriptor *)descriptor;
 @end

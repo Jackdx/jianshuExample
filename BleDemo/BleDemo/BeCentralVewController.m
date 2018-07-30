@@ -7,10 +7,9 @@
 //
 
 #import "BeCentralVewController.h"
+#import <CoreBluetooth/CoreBluetooth.h>
 
-
-
-@interface BeCentralVewController (){
+@interface BeCentralVewController () <CBCentralManagerDelegate,CBPeripheralDelegate>{
     //系统蓝牙设备管理对象，可以把他理解为主设备，通过他，可以去扫描和链接外设
     CBCentralManager *_manager;
     //用于保存被发现设备
@@ -43,7 +42,7 @@
     _discoverPeripherals = [[NSMutableArray alloc]init];
 }
 
-// 2. 检测中央设备状态(CBCentralManagerDelegate的required方法 【代理方法】
+// 2. 检测中央设备状态(CBCentralManagerDelegate的required方法) 【代理方法】
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central{
     
     switch (central.state) {
@@ -98,8 +97,6 @@
     // 5. 发起连接外设(connectPeripheral)
         [central connectPeripheral:peripheral options:nil];
 //    }
-    
-    
 }
 
 
@@ -146,7 +143,6 @@
         // 9. 发起发现外设的服务的特征(discoverCharacteristics: forService)
         [peripheral discoverCharacteristics:nil forService:service];
     }
-    
 }
 
 //扫描到Characteristics
@@ -179,8 +175,6 @@
     for (CBCharacteristic *characteristic in service.characteristics){
         [peripheral discoverDescriptorsForCharacteristic:characteristic];
     }
-    
-    
 }
 
 //获取的charateristic的值
@@ -189,7 +183,6 @@
     //打印出characteristic的UUID和值
     //!注意，value的类型是NSData，具体开发时，会根据外设协议制定的方式去解析数据
     NSLog(@"characteristic uuid:%@  value:%@",characteristic.UUID,characteristic.value);
-    
 }
 
 //搜索到Characteristic的Descriptors
@@ -203,7 +196,6 @@
         [peripheral readValueForDescriptor:d];
         NSLog(@"Descriptor uuid:%@",d.UUID);
     }
-    
 }
 //获取到Descriptors的值
 // 20. 更新特征的描述值【代理方法】
@@ -212,12 +204,12 @@
     //这个descriptor都是对于characteristic的描述，一般都是字符串，所以这里我们转换成字符串去解析
     NSLog(@"characteristic uuid:%@  value:%@",[NSString stringWithFormat:@"%@",descriptor.UUID],descriptor.value);
 }
+-(void)writeCharacteristic:(CBPeripheral *)peripheral value:(NSData *)data forDescriptor:(CBDescriptor *)descriptor
+{
+     // 21. 发起写入特征的描述值
+    [peripheral writeValue:data forDescriptor:descriptor];
+}
 
-/*
- // 21. 发起写入特征的描述值
- - (void)writeValue:(NSData *)data forDescriptor:(CBDescriptor *)descriptor;
-
- */
 // 22. 写入特征的描述值【代理方法】
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForDescriptor:(CBDescriptor *)descriptor error:(nullable NSError *)error
 {
@@ -228,7 +220,7 @@
             characteristic:(CBCharacteristic *)characteristic
                      value:(NSData *)value{
     
-    //打印出 characteristic 的权限，可以看到有很多种，这是一个NS_OPTIONS，就是可以同时用于好几个值，常见的有read，write，notify，indicate，知知道这几个基本就够用了，前两个是读写权限，后两个都是通知，两种不同的通知方式。
+    //打印出 characteristic 的权限，可以看到有很多种，这是一个NS_OPTIONS，就是可以同时用于好几个值，常见的有read，write，notify，indicate，知道这几个基本就够用了，前两个是读写权限，后两个都是通知，两种不同的通知方式。
     /*
      typedef NS_OPTIONS(NSUInteger, CBCharacteristicProperties) {
      CBCharacteristicPropertyBroadcast												= 0x01,
@@ -245,8 +237,6 @@
      
      */
     NSLog(@"%lu", (unsigned long)characteristic.properties);
-    
-    
     //只有 characteristic.properties 有write的权限才可以写
     if(characteristic.properties & CBCharacteristicPropertyWrite){
         /*
@@ -257,8 +247,6 @@
     }else{
         NSLog(@"该字段不可写！");
     }
-    
-    
 }
 
 // 14. 写入特征值成功(didWriteValueForCharacteristic) 【代理方法】
