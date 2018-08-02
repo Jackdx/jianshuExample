@@ -55,6 +55,8 @@ NSString * const MAX_BUFFERED_DURATION = @"Max Buffered Duration";
     NSLog(@"forward local player page...");
     NSString* videoFilePath = [CommonUtil bundlePath:@"recording.flv"];
 //    videoFilePath = @"http://wspull01.live.changbalive.com/easylive/1709828.flv";
+    
+    // 为了减少上传github的时间。。删除了test.flv。请自己找个flv或者其他格式的视频文件
     videoFilePath = [CommonUtil bundlePath:@"test.flv"];
     BOOL usingHWCodec = YES;
     ELVideoViewPlayerController *vc = [ELVideoViewPlayerController viewControllerWithContentPath:videoFilePath contentFrame:self.view.bounds parameters:_requestHeader];
